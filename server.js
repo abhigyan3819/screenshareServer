@@ -42,10 +42,9 @@ wss.on('connection', function connection(ws) {
     }
 
     if (role === 'sender') {
-      const frame = message.toString(); 
       for (const viewer of viewers) {
         if (viewer.readyState === WebSocket.OPEN) {
-          viewer.send(frame);
+            viewer.send(message);
         }
       }
     } else if (role === 'viewer') {
