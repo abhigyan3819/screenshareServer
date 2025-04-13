@@ -48,6 +48,10 @@ wss.on('connection', function connection(ws) {
           viewer.send(frame);
         }
       }
+    } else if (role === 'viewer') {
+      if (sender && sender.readyState === WebSocket.OPEN) {
+        sender.send(message);
+      }
     }
   });
 
@@ -55,6 +59,7 @@ wss.on('connection', function connection(ws) {
     console.error('WebSocket error:', error);
   });
 });
+
 const shutdown = () => {
   console.log('Shutting down WebSocket server...');
   wss.clients.forEach((client) => {
@@ -70,5 +75,5 @@ process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
 server.listen(port, () => {
-  console.log(`✅ WebSocket server running at ws://localhost:${port}`);
+  console.log(`✅ WebSocket server running at wss://screenshare-server:${port}`);
 });
