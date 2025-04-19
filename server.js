@@ -16,6 +16,8 @@ const wss = new WebSocket.Server({ server });
 
 let sender = null;
 const viewers = new Set();
+let audioSender = null;
+const audioViewers = new Set();
 
 wss.on('connection', function connection(ws) {
   let role = null;
@@ -23,6 +25,19 @@ wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
     if (!role) {
       role = message.toString();
+      if (role === 'audio') {
+        audioSender = ws;
+        console.log('Audio sender connected');
+        ws.on('close', () => {
+          audioSender = null;
+        });
+      } else if (role === 'audioviewer') {
+        audioViewers.add(ws);
+        console.log('Audio viewer connected');
+        ws.on('close', () => {
+          audioViewers.delete(ws);
+        });
+      }
       if (role === 'sender') {
         sender = ws;
         console.log('Sender connected');
@@ -50,6 +65,12 @@ wss.on('connection', function connection(ws) {
     } else if (role === 'viewer') {
       if (sender && sender.readyState === WebSocket.OPEN) {
         sender.send(message);
+      }
+    }else if (role === 'audio') {
+      for (const viewer of audioViewers) {
+        if (viewer.readyState === WebSocket.OPEN) {
+          viewer.send(message);
+        }
       }
     }
   });
