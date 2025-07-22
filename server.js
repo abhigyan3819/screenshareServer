@@ -8,7 +8,7 @@ const port = process.env.PORT || 8765;
 
 // Create a server instance
 const server = http.createServer((req, res) => {
-  res.writeHead(404);
+  res.writeHead(200);
   res.end();
 });
 
